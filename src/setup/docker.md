@@ -36,7 +36,7 @@ Connect to your PostgreSQL server and let's create a few databases. We're going 
 
 **2.** If you haven't done so already, it's a good time to make a folder for all of the files for your Liphium town now (like /home/liphium or something). But now, let's pull the official Liphium image from Docker Hub: `docker pull liphium/chat:latest`.
 
-**3.** Before we start getting into the configuration file, it's a good time to actually get your domain records set up. They will sometimes take a long time to be applied and if we're lucky they will already be ready when we get to actually connecting to the town. While you might not have Spaces set up after this, I still recommend at least adding the record to remind you of the existence of Spaces. Just create the records as described below, you can of course change the names.
+**3.** Before we start getting into the configuration file, it's a good time to actually get your domain records set up. They will sometimes take a long time to be applied and if we're lucky they will already be ready when we get to actually connecting to the town.
 
 | Type | Name   | Content      | Description                                                  |
 | ---- | ------ | ------------ | ------------------------------------------------------------ |
@@ -44,17 +44,106 @@ Connect to your PostgreSQL server and let's create a few databases. We're going 
 | A    | chat   | YOUR_IP_HERE | The domain of your chat server                               |
 | A    | spaces | YOUR_IP_HERE | The domain of your Spaces server                             |
 
-**4.** Now let's create an environment file for your Liphium town. Luckily for you, I already prepared [a GitHub Gist](https://gist.github.com/Unbreathable/5123cede38cc43ca48af5f87960ce717) as a template. Please download it and then follow the next steps that walk you through of how to change it up for your town.
+# Separate config setup for future guides
 
-**5.** First, let's tackle the domains. You already created subdomains on your domain for each of the servers that Liphium exposes. So please enter the full domain of your first A record right into `BASE_PATH`, followed by the second into `CHAT_NODE` and the third into `SPACE_NODE`. Just like I did it in my template for the domains above. **Please do not add https:// or http:// to your domain**. This is a common issue that breaks functionality of Liphium.
+**4.** Now let's create an environment file for your Liphium town. Copy the file below and call it `config.env`.
 
-**6.** Second, let's look at the database configuration. Please insert your credentials into there and make sure to use the correct stuff. If your database is running on the same system as the Liphium town, you can use `172.17.0.1` instead of `127.0.0.1` or `localhost` to reach it. I spent like 30 minutes yesterday debugging this issue.
+```sh
+# BACKEND CONFIGURATION
 
-**7.** Third, please generate a random string on some website or in your favorite password manager to paste into the `JWT_SECRET` environment variable. Please be sure to make it **extra long** (like **80-100 characters** should be enough) as this is a really important thing that you don't want others to guess. You can also not change this very easily in the future. So make sure you use something random and very long.
+# Domain config
+BASE_PATH=main.liphium.com
+BASE_PORT=4000
+CHAT_NODE=chat.liphium.com
+CHAT_NODE_PORT=4001
+SPACE_NODE=spaces.liphium.com
+SPACE_NODE_PORT=4002
 
-**8.** Fourth, let's get your email server connected. Just enter the details into the environment variables. You can do that right?
+# App config
+APP_NAME=Liphium
+TESTING=true
+LISTEN=0.0.0.0
+TESTING_AMOUNT=2
+PROTOCOL=https://
+CLI=false
 
-**9.** Next is actually running the app to get some more values out of it. So first, create a `files` folder in your current directory. This is where all the files uploaded to Liphium will be stored. You can also optionally have them be uploaded to Cloudflare R2 or similar solutions, but that's currently a little experimental. If you want to use S3 or R2 for file storage, send me a message on Discord (the invite is in the nav bar).
+# Database for the main server
+DB_USER=postgres
+DB_PASSWORD=pw
+DB_DATABASE=main
+DB_HOST=address
+DB_PORT=5432
+
+# Database for the chat server
+CN_DB_USER=postgres
+CN_DB_PASSWORD=pw
+CN_DB_DATABASE=chat
+CN_DB_HOST=address
+CN_DB_PORT=5432
+
+# JWT
+JWT_SECRET=generate_some_random_value
+
+# File storage folder
+FILE_REPO_TYPE=local
+FILE_REPO=/home
+
+# SMTP (for emails)
+SMTP_SERVER=mail.example.com
+SMTP_PORT=0000
+SMTP_IDENTITY=liphium
+SMTP_FROM=no-reply@example.com
+SMTP_USER=user
+SMTP_PW=pw
+```
+
+**5.** You already created subdomains on your domain for each of the servers that Liphium exposes in step 3. Change the following values of the configuration file above to point to your domain (replace example.com with your domain):
+
+- BASE_PATH=main.example.com
+- CHAT_NODE=chat.example.com
+- SPACE_NODE=spaces.example.com
+
+**Please do not add https:// or http:// to your domain**. This is a common issue that breaks functionality of Liphium.
+
+**6.** You created a main and chat PostgreSQL database before in this guide. Please also fill the data needed for the connection into the following configuration fields:
+
+- DB_USER=your_username
+- DB_PASSWORD=your_password
+- DB_DATABASE=main
+- DB_HOST=postgres_address (to reach the local system use `172.17.0.1` instead of `localhost`, [here's why](https://forums.docker.com/t/how-to-reach-localhost-on-host-from-docker-container/113321))
+- DB_PORT=5432 (default port of postgres)
+
+Now repeat the same for the database configuration of the chat server:
+
+- CN_DB_USER=your_username
+- CN_DB_PASSWORD=your_password
+- CN_DB_DATABASE=chat
+- CN_DB_HOST=postgres_address (to reach the local system use `172.17.0.1` instead of `localhost`, [here's why](https://forums.docker.com/t/how-to-reach-localhost-on-host-from-docker-container/113321))
+- CN_DB_PORT=5432 (default port of postgres)
+
+**7.** Please generate a random string on some website or in your favorite password manager to paste into the `JWT_SECRET` configuration value. Please be sure to make it **extra long** (like **80-100 characters** should be enough) as this is a really important thing that you don't want others to guess. You can also not change this very easily in the future. So make sure you use something random and very long.
+
+**8.** Now change the following configuration values for your mail server that Station will use:
+
+- SMTP_SERVER=mail.example.com (the domain of your mail server, replace `example.com` with your domain)
+- SMTP_PORT=your_smtp_port
+- SMTP_IDENTITY=your_smtp_identity
+- SMTP_FROM=no-reply@example.com (the email you want Liphium to use)
+- SMTP_USER=your_smtp_username
+- SMTP_PW=your_smtp_password
+
+# Continue working here (on S3)
+
+**9.** Now you need to decide which kind of storage you want to use for your files. If you just want a folder, go to the local storage tab below. If you want to use Cloudflare R2, AWS S3 or other file storage providers, click the tab for that.
+
+{{#tabs }}
+{{#tab name="Local storage" }}
+Create a `files` folder in your current directory. This is where all the files uploaded to Liphium will be stored. Everything should work if you follow the guide now. Just as a note, you can optionally take a look into the `FILE_REPO` configuration value. That's where the files will be put inside of your container (/home is the default).
+{{#endtab }}
+{{#tab name="S3-compatible storage" }}
+still needs work
+{{#endtab }}
+{{#endtabs }}
 
 **10.** Now run the docker container by using the command below. Make sure to replace `config.env` with the name of your environment file.
 

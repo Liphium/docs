@@ -5,3 +5,4 @@
   - [Docker](./setup/docker.md)
 - [Migration](./migration/index.md)
   - [Migration to 0.5.0](./migration/0.5-migration.md)
+  - [Migration to 1.0.0](./migration/1.0.0-migration.md)
