@@ -156,7 +156,7 @@
                         <h1 id="docker"><a class="header" href="#docker">Docker</a></h1>
 <p>So you want to make your own town, eh? Well <strong>if you've never touched a server you probably shouldn't attempt this</strong> as servers (especially with Linux) are not a newbie-friendly environment. But with that out of the way or if you're seeking a challenge, let's get a fresh new town onto your server!</p>
 <p>Also before we get started, you can always message me on Discord if you have any kind of problem with the installation or have some kind of other question. You can get to the Liphium Discord server through the invite in the navigation bar or menu at the top of the page.</p>
-<h3 id="requirements"><a class="header" href="#requirements">Requirements</a></h3>
+<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
 <p>Please make sure you have everything you need installed before installing Liphium because otherwise it can be quite a bit of pain to get everything set up.</p>
 <ul>
 <li>A domain that you will <a href="docs/general/faq/#why-do-i-need-a-domain-for-my-town">never change or sell</a> (read the linked FAQ question for more information).</li>
@@ -166,7 +166,7 @@
 <li>A PostgreSQL server that you can connect to.</li>
 <li>Decent skills with Docker (there might be issues).</li>
 </ul>
-<h3 id="tools-we-will-use"><a class="header" href="#tools-we-will-use">Tools we will use</a></h3>
+<h2 id="tools-we-will-use"><a class="header" href="#tools-we-will-use">Tools we will use</a></h2>
 <p>Alright, one more thing before we get started on the installation. I just want you to know what we are going to use so everything is clear. I'll have instructions on how to install Nginx and Certbot later. Although I just link you to their websites, respectively.</p>
 <ul>
 <li><strong>Nginx</strong>: Nginx is a reverse proxy for web requests that we'll use to expose your Liphium town to the outside world. We use it here because we're gonna create multiple domains pointing to the your server and it wouldn't be possible without nginx. We also need it to install SSL certificates for your domain so you can use the app properly.</li>
@@ -175,9 +175,9 @@
 <li><strong>Docker</strong>: Docker is going to be used to install the actual Liphium server (called station) onto your server. We're going to install PostgreSQL using Docker as well.</li>
 </ul>
 <p>With all of that explained, let's finally get to installing.</p>
-<h3 id="step-1-getting-your-postgresql-server-ready"><a class="header" href="#step-1-getting-your-postgresql-server-ready">Step 1: Getting your PostgreSQL server ready</a></h3>
+<h2 id="step-1-getting-your-postgresql-server-ready"><a class="header" href="#step-1-getting-your-postgresql-server-ready">Step 1: Getting your PostgreSQL server ready</a></h2>
 <p>Connect to your PostgreSQL server and let's create a few databases. We're going to need two databases: One for all of the accounts and one for all of the chat messages. You can create those two by typing <code>CREATE DATABASE chat; CREATE DATABASE main;</code>. Different names can also be used, just be sure to use the correct ones later.</p>
-<h3 id="step-2-creating-the-actual-liphium-town"><a class="header" href="#step-2-creating-the-actual-liphium-town">Step 2: Creating the actual Liphium town</a></h3>
+<h2 id="step-2-creating-the-actual-liphium-town"><a class="header" href="#step-2-creating-the-actual-liphium-town">Step 2: Creating the actual Liphium town</a></h2>
 <p><strong>1.</strong> Alright, now it's time for you to venture out by yourself for the first time. And that's to <a href="https://docs.docker.com/engine/install/">installing Docker</a>. They have amazing documentation over there and you should hopefully be able to get it running your machine. Complete it until the end where they tell you to run the hello-world image and when you've done all of that, you can come back here.</p>
 <p><strong>2.</strong> If you haven't done so already, it's a good time to make a folder for all of the files for your Liphium town now (like /home/liphium or something). But now, let's pull the official Liphium image from Docker Hub: <code>docker pull liphium/chat:latest</code>.</p>
 <p><strong>3.</strong> Before we start getting into the configuration file, it's a good time to actually get your domain records set up. They will sometimes take a long time to be applied and if we're lucky they will already be ready when we get to actually connecting to the town.</p>
@@ -187,109 +187,16 @@
 <tr><td>A</td><td>spaces</td><td>YOUR_IP_HERE</td><td>The domain of your Spaces server</td></tr>
 </tbody></table>
 </div>
-<h1 id="separate-config-setup-for-future-guides"><a class="header" href="#separate-config-setup-for-future-guides">Separate config setup for future guides</a></h1>
-<p><strong>4.</strong> Now let's create an environment file for your Liphium town. Copy the file below and call it <code>config.env</code>.</p>
-<pre><code class="language-sh"># BACKEND CONFIGURATION
-
-# Domain config
-BASE_PATH=main.liphium.com
-BASE_PORT=4000
-CHAT_NODE=chat.liphium.com
-CHAT_NODE_PORT=4001
-SPACE_NODE=spaces.liphium.com
-SPACE_NODE_PORT=4002
-
-# App config
-APP_NAME=Liphium
-TESTING=true
-LISTEN=0.0.0.0
-TESTING_AMOUNT=2
-PROTOCOL=https://
-CLI=false
-
-# Database for the main server
-DB_USER=postgres
-DB_PASSWORD=pw
-DB_DATABASE=main
-DB_HOST=address
-DB_PORT=5432
-
-# Database for the chat server
-CN_DB_USER=postgres
-CN_DB_PASSWORD=pw
-CN_DB_DATABASE=chat
-CN_DB_HOST=address
-CN_DB_PORT=5432
-
-# JWT
-JWT_SECRET=generate_some_random_value
-
-# File storage folder
-FILE_REPO_TYPE=local
-FILE_REPO=/home
-
-# SMTP (for emails)
-SMTP_SERVER=mail.example.com
-SMTP_PORT=0000
-SMTP_IDENTITY=liphium
-SMTP_FROM=no-reply@example.com
-SMTP_USER=user
-SMTP_PW=pw
-</code></pre>
-<p><strong>5.</strong> You already created subdomains on your domain for each of the servers that Liphium exposes in step 3. Change the following values of the configuration file above to point to your domain (replace example.com with your domain):</p>
-<ul>
-<li>BASE_PATH=main.example.com</li>
-<li>CHAT_NODE=chat.example.com</li>
-<li>SPACE_NODE=spaces.example.com</li>
-</ul>
-<p><strong>Please do not add https:// or http:// to your domain</strong>. This is a common issue that breaks functionality of Liphium.</p>
-<p><strong>6.</strong> You created a main and chat PostgreSQL database before in this guide. Please also fill the data needed for the connection into the following configuration fields:</p>
-<ul>
-<li>DB_USER=your_username</li>
-<li>DB_PASSWORD=your_password</li>
-<li>DB_DATABASE=main</li>
-<li>DB_HOST=postgres_address (to reach the local system use <code>172.17.0.1</code> instead of <code>localhost</code>, <a href="https://forums.docker.com/t/how-to-reach-localhost-on-host-from-docker-container/113321">here's why</a>)</li>
-<li>DB_PORT=5432 (default port of postgres)</li>
-</ul>
-<p>Now repeat the same for the database configuration of the chat server:</p>
-<ul>
-<li>CN_DB_USER=your_username</li>
-<li>CN_DB_PASSWORD=your_password</li>
-<li>CN_DB_DATABASE=chat</li>
-<li>CN_DB_HOST=postgres_address (to reach the local system use <code>172.17.0.1</code> instead of <code>localhost</code>, <a href="https://forums.docker.com/t/how-to-reach-localhost-on-host-from-docker-container/113321">here's why</a>)</li>
-<li>CN_DB_PORT=5432 (default port of postgres)</li>
-</ul>
-<p><strong>7.</strong> Please generate a random string on some website or in your favorite password manager to paste into the <code>JWT_SECRET</code> configuration value. Please be sure to make it <strong>extra long</strong> (like <strong>80-100 characters</strong> should be enough) as this is a really important thing that you don't want others to guess. You can also not change this very easily in the future. So make sure you use something random and very long.</p>
-<p><strong>8.</strong> Now change the following configuration values for your mail server that Station will use:</p>
-<ul>
-<li>SMTP_SERVER=mail.example.com (the domain of your mail server, replace <code>example.com</code> with your domain)</li>
-<li>SMTP_PORT=your_smtp_port</li>
-<li>SMTP_IDENTITY=your_smtp_identity</li>
-<li>SMTP_FROM=no-reply@example.com (the email you want Liphium to use)</li>
-<li>SMTP_USER=your_smtp_username</li>
-<li>SMTP_PW=your_smtp_password</li>
-</ul>
-<h1 id="continue-working-here-on-s3"><a class="header" href="#continue-working-here-on-s3">Continue working here (on S3)</a></h1>
-<p><strong>9.</strong> Now you need to decide which kind of storage you want to use for your files. If you just want a folder, go to the local storage tab below. If you want to use Cloudflare R2, AWS S3 or other file storage providers, click the tab for that.</p>
-<div class="mdbook-tabs-container">
-<nav class="mdbook-tabs">
-<button class="mdbook-tab active" data-tabname="Local storage">Local storage</button>
-<button class="mdbook-tab" data-tabname="S3-compatible storage">S3-compatible storage</button>
-</nav>
-<div class="mdbook-tab-content" data-tabname="Local storage">
-<p>Create a <code>files</code> folder in your current directory. This is where all the files uploaded to Liphium will be stored. Everything should work if you follow the guide now. Just as a note, you can optionally take a look into the <code>FILE_REPO</code> configuration value. That's where the files will be put inside of your container (/home is the default).</p>
-</div>
-<div class="mdbook-tab-content hidden" data-tabname="S3-compatible storage">
-<p>still needs work</p>
-</div>
-</div>
-<p><strong>10.</strong> Now run the docker container by using the command below. Make sure to replace <code>config.env</code> with the name of your environment file.</p>
+<p><strong>4.</strong> Now let's create the configuration/environment file for your Liphium town. To do this, please follow our <a href="./config-setup.html#creating-a-new-configuration">config setup guide</a> and come back here once you finished creating the config.</p>
+<p><strong>5.</strong> If you chose local storage for your files, please create a folder called <code>files</code> in the current directory. All of your files will go into there.</p>
+<p><strong>6.</strong> Now run the docker container by using the command below. Make sure to replace <code>config.env</code> with the name of your environment/configuration file (or leave it alone if you called yours <code>config.env</code>).</p>
 <pre><code class="language-sh">docker run --env-file config.env -p 127.0.0.1:4002:4002 -p 127.0.0.1:4001:4001 -p 127.0.0.1:4000:4000 -v ./files:/home liphium/chat
 </code></pre>
-<p><strong>11.</strong> Alright, after running the container once, it should print out that you should set <code>TC_PUBLIC_KEY</code> and <code>TC_PRIVATE_KEY</code>. Take the thing the container printed out and just add it to the bottom of <code>config.env</code>. Make sure to set both of those environment variables from the same run of Liphium. Otherwise they are not going to work together. Also make sure you remove the all the spaces and the double quotes. It should look something like this: TC_PUBLIC_KEY=value. Do the same for <code>TC_PRIVATE_KEY</code> as well.</p>
-<p><strong>12.</strong> Now, for the last time, run the container again. It's going to ask you to set the <code>SYSTEM_UUID</code> environment variable to the thing it prints out. Also give it the same treatment as above and make it look like this: SYSTEM_UUID=value.</p>
-<p><strong>13.</strong> Your setup of the main Liphium town is now complete. You should now be able to just run the thing and it should already be connecting to the database. The only thing that shouldn't work is grabbing the server public key. But we're going to fix that now.</p>
-<h3 id="step-3-exposing-your-town-to-the-internet-with-nginx"><a class="header" href="#step-3-exposing-your-town-to-the-internet-with-nginx">Step 3: Exposing your town to the internet with Nginx</a></h3>
+<p><strong>7.</strong> Alright, after running the container once, it should print out that you should set <code>TC_PUBLIC_KEY</code> and <code>TC_PRIVATE_KEY</code>. Take the thing the container printed out and just add it to the bottom of <code>config.env</code>. Make sure to set both of those environment/configuration variables from the same run of Liphium. Otherwise they are not going to work together. Also make sure you remove the all the spaces and the double quotes. It should look something like this: <code>TC_PUBLIC_KEY=value</code>. <code>value</code> should not be surrounded by ", otherwise starting your town will not work. Do the same for <code>TC_PRIVATE_KEY</code> as well.</p>
+<p><strong>8.</strong> Now, for the last time, run the container again. It's going to ask you to set the <code>SYSTEM_UUID</code> environment variable to the thing it prints out. Also give it the same treatment as above and make it look like this: <code>SYSTEM_UUID=value</code>. <code>value</code> should again not be surrounded by ", otherwise station will not work.</p>
+<p><strong>9.</strong> Your setup of the main Liphium town is now complete. You should now be able to just run the thing and it should already be connecting to the database. The only thing that shouldn't work is grabbing the server public key. But we're going to fix that now.</p>
+<h2 id="step-3-exposing-your-town-to-the-internet-with-nginx"><a class="header" href="#step-3-exposing-your-town-to-the-internet-with-nginx">Step 3: Exposing your town to the internet with Nginx</a></h2>
+<h1 id="todo-finish-tutorial-here"><a class="header" href="#todo-finish-tutorial-here">TODO: Finish tutorial here</a></h1>
 <p><strong>1.</strong> First, you of course need to install Nginx. If you are on Ubuntu or Debian, you can just run the command below. If not, you might have to look up a tutorial on how to do it or just use the package your package manager provides (if it exists).</p>
 <pre><code class="language-sh">apt install nginx
 </code></pre>
@@ -303,14 +210,14 @@ ln -s /etc/nginx/sites-available/liphium-spaces /etc/nginx/sites-enabled/liphium
 </code></pre>
 <p><strong>6.</strong> Run <code>nginx -t</code> to validate that the configurations work properly. If they don't, do what the command tells you to fix the configurations up bit by bit.</p>
 <p><strong>7.</strong> You can now restart Nginx by typing <code>systemctl restart nginx</code>. You should now have the configurations loaded.</p>
-<h3 id="step-4-adding-ssl-certificates-to-your-town-using-certbot"><a class="header" href="#step-4-adding-ssl-certificates-to-your-town-using-certbot">Step 4: Adding SSL certificates to your town using Certbot</a></h3>
+<h2 id="step-4-adding-ssl-certificates-to-your-town-using-certbot"><a class="header" href="#step-4-adding-ssl-certificates-to-your-town-using-certbot">Step 4: Adding SSL certificates to your town using Certbot</a></h2>
 <p><strong>1.</strong> For Certbot to work, there are actually two things you need to install. You can follow <a href="https://certbot.eff.org/instructions?ws=nginx&amp;os=snap">this guide</a> from the official website. <strong>Please follow their guide until step 5</strong>.</p>
 <p><strong>2.</strong> To secure your town, we first need to make sure your domains are already updated and already redirect to the correct server. To verify if they are already set up correctly, go to <code>main.yourdomain.com</code> (or whatever you used) and check if there is some sort of error from nginx. If it's not there yet, you'll have to wait a little bit before getting your certificates. This is because your domain isn't pointing to the server yet. This can take up to 48 hours to happen in some cases. So if this happened to you just be patient for now, I know this sucks, but it can happen.</p>
 <p><strong>3.</strong> When you did see the error from nginx, you can now just run <code>certbot --nginx</code> to apply the certificates. The CLI will ask your for a few things. For example, they'll ask you to enter your email address. Please do, so you are always notified if something is wrong with your certificates. When they finally ask which domains you want to secure, just leave the field blank to select all of them. Certbot will then do its magic and you are officially done with the setup.</p>
-<h3 id="step-5-getting-into-your-town"><a class="header" href="#step-5-getting-into-your-town">Step 5: Getting into your town</a></h3>
+<h2 id="step-5-getting-into-your-town"><a class="header" href="#step-5-getting-into-your-town">Step 5: Getting into your town</a></h2>
 <p>When you now connect to your Liphium town for the first time with any client app, you can enter the <code>SYSTEM_UUID</code> environment variable as the invite. This is an invite created to make sure an account can be created.</p>
 <p>If you just created the first account on your Liphium town, it will automatically have admin permissions. You can now go to Settings -&gt; Invites -&gt; Generate invite to invite other people to your town.</p>
-<h3 id="were-finally-done"><a class="header" href="#were-finally-done">We're finally done</a></h3>
+<h2 id="were-finally-done"><a class="header" href="#were-finally-done">We're finally done</a></h2>
 <p>I know it took a long time to get Liphium installed. Thanks for following this guide until now and I hope you didn't run into too many issues. I'm tired now and I'm gonna go watch a few episodes of Shikanoko now. This thing took like 3-4 hours to write and I hope it helped.</p>
 
                     </main>
@@ -321,7 +228,7 @@ ln -s /etc/nginx/sites-available/liphium-spaces /etc/nginx/sites-enabled/liphium
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../migration/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../setup/config-setup.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -335,7 +242,7 @@ ln -s /etc/nginx/sites-available/liphium-spaces /etc/nginx/sites-enabled/liphium
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../migration/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../setup/config-setup.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
