@@ -4,24 +4,23 @@ So you want to make your own town, eh? Well **if you've never touched a server y
 
 Also before we get started, you can always message me on Discord if you have any kind of problem with the installation or have some kind of other question. You can get to the Liphium Discord server through the invite in the navigation bar or menu at the top of the page.
 
+One more thing I want to add is that the software we're going to be installing is called station. It's the backend I created that acts as the base of your town. Just so you aren't confused when you read it throughout this guide.
+
 ## Requirements
 
-Please make sure you have everything you need installed before installing Liphium because otherwise it can be quite a bit of pain to get everything set up.
+Please make sure you have everything you need before trying to install station because otherwise it can be quite a bit of pain to get everything set up.
 
-- A domain that you will [never change or sell](docs/general/faq/#why-do-i-need-a-domain-for-my-town) (read the linked FAQ question for more information).
-- A server running Linux.
-- The latest version of Docker. You can learn how install it [here](https://docs.docker.com/engine/install/).
+- A domain that you will never change or sell (because otherwise the entire platform falls apart as the client relies on this)
 - A mail server for Liphium to send you emails with SMTP credentials (it is required or registration will fail when people try to make an account).
 - A PostgreSQL server that you can connect to.
-- Decent skills with Docker (there might be issues).
 
 ## Tools we will use
 
 Alright, one more thing before we get started on the installation. I just want you to know what we are going to use so everything is clear. I'll have instructions on how to install Nginx and Certbot later. Although I just link you to their websites, respectively.
 
-- **Nginx**: Nginx is a reverse proxy for web requests that we'll use to expose your Liphium town to the outside world. We use it here because we're gonna create multiple domains pointing to the your server and it wouldn't be possible without nginx. We also need it to install SSL certificates for your domain so you can use the app properly.
+- **Nginx**: Nginx is a reverse proxy for web requests that we'll use to expose your Liphium town to the outside world. We use it here because we're gonna create multiple domains pointing to one server and that wouldn't be possible without Nginx. We also need it to install SSL certificates for your domain so you can use the app properly.
 - **PostgreSQL**: The database we're going to use for Liphium. All of your data is stored in here.
-- **Certbot**: Well, this is gonna be the way we make your Liphium town secure by installing SSL certificates for your domain. It's completely free and really easy to use. I even donated 10€ because it's just awesome. [You can too](https://supporters.eff.org/donate/support-work-on-certbot).
+- **Certbot**: Well, this is gonna be the way we make your Liphium town secure by installing SSL certificates for your domain. It's completely free and really easy to use. I even donated 10€ because it's just awesome. Getting certificates was really difficult in the past, and [you can donate, too](https://supporters.eff.org/donate/support-work-on-certbot).
 - **Docker**: Docker is going to be used to install the actual Liphium server (called station) onto your server. We're going to install PostgreSQL using Docker as well.
 
 With all of that explained, let's finally get to installing.
@@ -72,7 +71,24 @@ apt install nginx
 
 **3.** Now you're going to need a few configurations again. Create the files in the `/etc/nginx/sites-available` folder as specified below:
 
-File name: liphium-chat
+File name: `liphium-main`
+
+```sh
+server {
+  server_name main.example.com;
+
+  location /v1/account/files/upload {
+    client_max_body_size 10m; # Change this based on your preferences (10m = 10 megabytes)
+    proxy_pass http://localhost:4000;
+  }
+
+  location / {
+     proxy_pass http://localhost:4000;
+  }
+}
+```
+
+File name: `liphium-chat`
 
 ```sh
 server {
@@ -115,24 +131,7 @@ server {
 }
 ```
 
-File name: liphium-main
-
-```sh
-server {
-  server_name main.example.com;
-
-  location /v1/account/files/upload {
-    client_max_body_size 10m; # Change this based on your preferences (10m = 10 megabytes)
-    proxy_pass http://localhost:4000;
-  }
-
-  location / {
-     proxy_pass http://localhost:4000;
-  }
-}
-```
-
-File name: liphium-spaces
+File name: `liphium-spaces`
 
 ```sh
 server {

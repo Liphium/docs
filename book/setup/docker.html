@@ -156,22 +156,20 @@
                         <h1 id="docker"><a class="header" href="#docker">Docker</a></h1>
 <p>So you want to make your own town, eh? Well <strong>if you've never touched a server you probably shouldn't attempt this</strong> as servers (especially with Linux) are not a newbie-friendly environment. But with that out of the way or if you're seeking a challenge, let's get a fresh new town onto your server!</p>
 <p>Also before we get started, you can always message me on Discord if you have any kind of problem with the installation or have some kind of other question. You can get to the Liphium Discord server through the invite in the navigation bar or menu at the top of the page.</p>
+<p>One more thing I want to add is that the software we're going to be installing is called station. It's the backend I created that acts as the base of your town. Just so you aren't confused when you read it throughout this guide.</p>
 <h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
-<p>Please make sure you have everything you need installed before installing Liphium because otherwise it can be quite a bit of pain to get everything set up.</p>
+<p>Please make sure you have everything you need before trying to install station because otherwise it can be quite a bit of pain to get everything set up.</p>
 <ul>
-<li>A domain that you will <a href="docs/general/faq/#why-do-i-need-a-domain-for-my-town">never change or sell</a> (read the linked FAQ question for more information).</li>
-<li>A server running Linux.</li>
-<li>The latest version of Docker. You can learn how install it <a href="https://docs.docker.com/engine/install/">here</a>.</li>
+<li>A domain that you will never change or sell (because otherwise the entire platform falls apart as the client relies on this)</li>
 <li>A mail server for Liphium to send you emails with SMTP credentials (it is required or registration will fail when people try to make an account).</li>
 <li>A PostgreSQL server that you can connect to.</li>
-<li>Decent skills with Docker (there might be issues).</li>
 </ul>
 <h2 id="tools-we-will-use"><a class="header" href="#tools-we-will-use">Tools we will use</a></h2>
 <p>Alright, one more thing before we get started on the installation. I just want you to know what we are going to use so everything is clear. I'll have instructions on how to install Nginx and Certbot later. Although I just link you to their websites, respectively.</p>
 <ul>
-<li><strong>Nginx</strong>: Nginx is a reverse proxy for web requests that we'll use to expose your Liphium town to the outside world. We use it here because we're gonna create multiple domains pointing to the your server and it wouldn't be possible without nginx. We also need it to install SSL certificates for your domain so you can use the app properly.</li>
+<li><strong>Nginx</strong>: Nginx is a reverse proxy for web requests that we'll use to expose your Liphium town to the outside world. We use it here because we're gonna create multiple domains pointing to one server and that wouldn't be possible without Nginx. We also need it to install SSL certificates for your domain so you can use the app properly.</li>
 <li><strong>PostgreSQL</strong>: The database we're going to use for Liphium. All of your data is stored in here.</li>
-<li><strong>Certbot</strong>: Well, this is gonna be the way we make your Liphium town secure by installing SSL certificates for your domain. It's completely free and really easy to use. I even donated 10€ because it's just awesome. <a href="https://supporters.eff.org/donate/support-work-on-certbot">You can too</a>.</li>
+<li><strong>Certbot</strong>: Well, this is gonna be the way we make your Liphium town secure by installing SSL certificates for your domain. It's completely free and really easy to use. I even donated 10€ because it's just awesome. Getting certificates was really difficult in the past, and <a href="https://supporters.eff.org/donate/support-work-on-certbot">you can donate, too</a>.</li>
 <li><strong>Docker</strong>: Docker is going to be used to install the actual Liphium server (called station) onto your server. We're going to install PostgreSQL using Docker as well.</li>
 </ul>
 <p>With all of that explained, let's finally get to installing.</p>
@@ -201,7 +199,21 @@
 </code></pre>
 <p><strong>2.</strong> After installing Nginx, we're going to need to set up a few sites. There should already be a directory called <code>/etc/nginx/sites-available</code>, but if it is not there, just create it. Enter this directory.</p>
 <p><strong>3.</strong> Now you're going to need a few configurations again. Create the files in the <code>/etc/nginx/sites-available</code> folder as specified below:</p>
-<p>File name: liphium-chat</p>
+<p>File name: <code>liphium-main</code></p>
+<pre><code class="language-sh">server {
+  server_name main.example.com;
+
+  location /v1/account/files/upload {
+    client_max_body_size 10m; # Change this based on your preferences (10m = 10 megabytes)
+    proxy_pass http://localhost:4000;
+  }
+
+  location / {
+     proxy_pass http://localhost:4000;
+  }
+}
+</code></pre>
+<p>File name: <code>liphium-chat</code></p>
 <pre><code class="language-sh">server {
     server_name chat.example.com;
 
@@ -241,21 +253,7 @@
     }
 }
 </code></pre>
-<p>File name: liphium-main</p>
-<pre><code class="language-sh">server {
-  server_name main.example.com;
-
-  location /v1/account/files/upload {
-    client_max_body_size 10m; # Change this based on your preferences (10m = 10 megabytes)
-    proxy_pass http://localhost:4000;
-  }
-
-  location / {
-     proxy_pass http://localhost:4000;
-  }
-}
-</code></pre>
-<p>File name: liphium-spaces</p>
+<p>File name: <code>liphium-spaces</code></p>
 <pre><code class="language-sh">server {
     server_name spaces.example.com;
 
