@@ -5,3 +5,5 @@ Welcome to the part of the documentation where I teach you how to deploy a town 
 For now we have the following guides available:
 
 - [Creating a Town using Docker](/setup/docker.html)
+
+If you want to change anything about your config or need an explanation for anything in the environment file, you can go straight to the [configuration guide](./config-setup.md).

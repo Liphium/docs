@@ -62,8 +62,6 @@ docker run --env-file config.env -p 127.0.0.1:4002:4002 -p 127.0.0.1:4001:4001 -
 
 ## Step 3: Exposing your town to the internet with Nginx
 
-# TODO: Finish tutorial here
-
 **1.** First, you of course need to install Nginx. If you are on Ubuntu or Debian, you can just run the command below. If not, you might have to look up a tutorial on how to do it or just use the package your package manager provides (if it exists).
 
 ```sh
@@ -72,9 +70,95 @@ apt install nginx
 
 **2.** After installing Nginx, we're going to need to set up a few sites. There should already be a directory called `/etc/nginx/sites-available`, but if it is not there, just create it. Enter this directory.
 
-**3.** Now you're going to need two configs again. As usual, just download them from [here](https://gist.github.com/Unbreathable/0469cfd271b84340429c140dde830642). This time it's three files though. Make sure you grab all of them and put them into the `/etc/nginx/sites-available` folder.
+**3.** Now you're going to need a few configurations again. Create the files in the `/etc/nginx/sites-available` folder as specified below:
 
-**4.** Change the domains in the configurations (behind `server_name`) you just downloaded from me to reflect your domain setup (for example: main.liphium.com -> main.example.com). Make sure to not forget the semicolon at the end!
+File name: liphium-chat
+
+```sh
+server {
+    server_name chat.example.com;
+
+    # Live share subscribe
+    location /liveshare/subscribe {
+        proxy_http_version 1.1;
+
+        proxy_connect_timeout 7d;
+        proxy_send_timeout 7d;
+        proxy_read_timeout 7d;
+        proxy_buffering off;
+        proxy_cache off;
+
+        proxy_set_header Connection "keep-alive";
+        chunked_transfer_encoding off;
+
+        proxy_pass http://localhost:4001/liveshare/subscribe;
+    }
+
+    # WebSocket endpoint
+    location /gateway {
+        proxy_http_version 1.1;
+
+        proxy_connect_timeout 7d;
+        proxy_send_timeout 7d;
+        proxy_read_timeout 7d;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_pass http://localhost:4001/gateway;
+    }
+
+    # Every other endpoint
+    location / {
+        proxy_pass http://localhost:4001;
+    }
+}
+```
+
+File name: liphium-main
+
+```sh
+server {
+  server_name main.example.com;
+
+  location /v1/account/files/upload {
+    client_max_body_size 10m; # Change this based on your preferences (10m = 10 megabytes)
+    proxy_pass http://localhost:4000;
+  }
+
+  location / {
+     proxy_pass http://localhost:4000;
+  }
+}
+```
+
+File name: liphium-spaces
+
+```sh
+server {
+    server_name spaces.example.com;
+
+    # The WebSocket gateway
+    location /gateway {
+        proxy_http_version 1.1;
+
+        proxy_connect_timeout 7d;
+        proxy_send_timeout 7d;
+        proxy_read_timeout 7d;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_pass http://localhost:4002/gateway;
+    }
+
+    location / {
+        proxy_pass http://localhost:4002;
+    }
+}
+```
+
+**4.** Change the domains in the configurations (behind `server_name`) you just downloaded from me to reflect your domain setup (for example: main.example.com -> main.liphium.com). Make sure to not forget the semicolon at the end!
 
 **5.** Let's make Nginx actually use those configurations. To do that just run the commands below to create links to the files in the `/etc/nginx/sites-enabled` folder.
 
@@ -88,20 +172,20 @@ ln -s /etc/nginx/sites-available/liphium-spaces /etc/nginx/sites-enabled/liphium
 
 **7.** You can now restart Nginx by typing `systemctl restart nginx`. You should now have the configurations loaded.
 
+**8.** Try to go to one of your domains, like `http://main.example.com` (replaced with your domain) and see if there is a nginx error there. If there is, everything worked. If there isn't, everything could still be working fine and your domains could just not be updated yet. As I specified above, that can take up to 48 hours.
+
 ## Step 4: Adding SSL certificates to your town using Certbot
 
 **1.** For Certbot to work, there are actually two things you need to install. You can follow [this guide](https://certbot.eff.org/instructions?ws=nginx&os=snap) from the official website. **Please follow their guide until step 5**.
 
-**2.** To secure your town, we first need to make sure your domains are already updated and already redirect to the correct server. To verify if they are already set up correctly, go to `main.yourdomain.com` (or whatever you used) and check if there is some sort of error from nginx. If it's not there yet, you'll have to wait a little bit before getting your certificates. This is because your domain isn't pointing to the server yet. This can take up to 48 hours to happen in some cases. So if this happened to you just be patient for now, I know this sucks, but it can happen.
+**2.** To secure your town, we first need to make sure your domains are already updated and already redirect to the correct server. To verify if they are already set up correctly, go to `main.example.com` (replaced with your domain) and check if there is some sort of error from nginx. If it's not there yet, you'll have to wait a little bit before getting your certificates. This is because your domain isn't pointing to the server yet. This can take up to 48 hours to happen in some cases. So if this happened to you just be patient for now, I know this sucks, but it can happen.
 
 **3.** When you did see the error from nginx, you can now just run `certbot --nginx` to apply the certificates. The CLI will ask your for a few things. For example, they'll ask you to enter your email address. Please do, so you are always notified if something is wrong with your certificates. When they finally ask which domains you want to secure, just leave the field blank to select all of them. Certbot will then do its magic and you are officially done with the setup.
 
 ## Step 5: Getting into your town
 
-When you now connect to your Liphium town for the first time with any client app, you can enter the `SYSTEM_UUID` environment variable as the invite. This is an invite created to make sure an account can be created.
+You can now use any of the official client apps to connect to your Liphium town by using the main domain (the one you replaced `main.example.com` with until now). **Make sure to not enter https:// or http:// in front of the domain**.
 
-If you just created the first account on your Liphium town, it will automatically have admin permissions. You can now go to Settings -> Invites -> Generate invite to invite other people to your town.
+You will then have to create an account using a email address, a password and a username. After entering your email, you will be asked for an invite. This is a token required for anyone wanting to create an account in your town. Each invite can only be used once and the value you set `SYSTEM_UUID` to in your configuration file is an invite station creates automatically. Use that one to create your account, you will automatically get admin permissions as well as long as you are the first account created.
 
-## We're finally done
-
-I know it took a long time to get Liphium installed. Thanks for following this guide until now and I hope you didn't run into too many issues. I'm tired now and I'm gonna go watch a few episodes of Shikanoko now. This thing took like 3-4 hours to write and I hope it helped.
+If you want to take a look at the settings of your town, you can find all of that under the "Your town" category when you go to the settings in the Liphium app. If you want to invite other people to your town, you can go to Settings -> Invites -> Generate invite to create invites for other people to be able to create accounts in your town. I hope you have a lot of fun with Liphium, and wish you a nice rest of your day!
