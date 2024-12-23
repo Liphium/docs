@@ -452,13 +452,13 @@ FILE_REPO_BUCKET=s3_bucket_name
 <p>I'm sorry for rolling out this update in such a weird way. I learned from my mistakes and next time I'll make sure to provide migration guides and resources on what's new directly before the update and not when it's already out for a day.</p>
 <p>Well, some of the problems with the recent update have already been fixed in a little update called 0.5.1 for the server and v0.5.2 for the client, respectively. I hope that this doesn't happen again and in the future all the releases will be thorougly tested before release. I complain about this myself all the time, so I also wanna prevent it for my own app.</p>
 <p>And with that, I wish you a happy rest of your day and a lot of fun with Liphium!</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="migration-to-station-100"><a class="header" href="#migration-to-station-100">Migration to station 1.0.0</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="migration-to-station-060"><a class="header" href="#migration-to-station-060">Migration to station 0.6.0</a></h1>
 <p>Hi, it's time for another migration because of another Liphium update, how great! Well this time it's really not a lot, but if you used to official Docker guide to upgrade to this release, you'll have to migrate your Nginx config because it's no longer letting Zap through.</p>
 <h2 id="everything-that-changed-1"><a class="header" href="#everything-that-changed-1">Everything that changed</a></h2>
 <ul>
 <li>Zap got a few performance improvements and an improved chunking size of 1 MB. In our tests this always performed better than the 512 KB we had before. You can read more about that <a href="https://github.com/Liphium/station/tree/main/CHANGELOG.md">in the changelog</a>.</li>
 </ul>
-<h2 id="how-to-migrate-to-100"><a class="header" href="#how-to-migrate-to-100">How to migrate to 1.0.0</a></h2>
+<h2 id="how-to-migrate-to-060"><a class="header" href="#how-to-migrate-to-060">How to migrate to 0.6.0</a></h2>
 <p>You just have to change your Nginx config for chat server (the thing handling chat messages) and add the following in front of <code>location / {</code>.</p>
 <pre><code class="language-sh"># Zap upload endpoint (just to make sure nothing happens)
 location /auth/liveshare/upload {
@@ -487,22 +487,6 @@ location /auth/liveshare/upload {
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 

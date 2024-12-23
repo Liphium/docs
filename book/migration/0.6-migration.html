@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Migration to 1.0.0 - Liphium Town Documentation</title>
+        <title>Migration to 0.6.0 - Liphium Town Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -153,13 +153,13 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="migration-to-station-100"><a class="header" href="#migration-to-station-100">Migration to station 1.0.0</a></h1>
+                        <h1 id="migration-to-station-060"><a class="header" href="#migration-to-station-060">Migration to station 0.6.0</a></h1>
 <p>Hi, it's time for another migration because of another Liphium update, how great! Well this time it's really not a lot, but if you used to official Docker guide to upgrade to this release, you'll have to migrate your Nginx config because it's no longer letting Zap through.</p>
 <h2 id="everything-that-changed"><a class="header" href="#everything-that-changed">Everything that changed</a></h2>
 <ul>
 <li>Zap got a few performance improvements and an improved chunking size of 1 MB. In our tests this always performed better than the 512 KB we had before. You can read more about that <a href="https://github.com/Liphium/station/tree/main/CHANGELOG.md">in the changelog</a>.</li>
 </ul>
-<h2 id="how-to-migrate-to-100"><a class="header" href="#how-to-migrate-to-100">How to migrate to 1.0.0</a></h2>
+<h2 id="how-to-migrate-to-060"><a class="header" href="#how-to-migrate-to-060">How to migrate to 0.6.0</a></h2>
 <p>You just have to change your Nginx config for chat server (the thing handling chat messages) and add the following in front of <code>location / {</code>.</p>
 <pre><code class="language-sh"># Zap upload endpoint (just to make sure nothing happens)
 location /auth/liveshare/upload {
@@ -194,22 +194,6 @@ location /auth/liveshare/upload {
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 
