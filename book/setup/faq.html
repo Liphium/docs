@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Town setup - Liphium Town Documentation</title>
+        <title>Frequently asked questions - Liphium Town Documentation</title>
 
 
         <!-- Custom HTML head -->
@@ -153,24 +153,22 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="town-setup"><a class="header" href="#town-setup">Town setup</a></h1>
-<p>Welcome to the part of the documentation where I teach you how to deploy a town on your own server. Please understand that I don't have infinite time to cover every method, so if you have anything missing, you can contribute it on the <a href="https://github.com/Liphium/docs">GitHub repository for this page</a>. I'm happy about every single thing we can add to this documentation because there are always people that use something different than you.</p>
-<p>If you have any question and don't know where to look, you might want to take a look at the <a href="./faq.html">frequently asked questions</a> about setup.</p>
-<p>For now we have the following guides available:</p>
-<ul>
-<li><a href="/setup/docker.html">Creating a Town using Docker</a></li>
-</ul>
-<p>If you want to change anything about your config or need an explanation for anything in the environment file, you can go straight to the <a href="./config-setup.html">configuration guide</a>.</p>
+                        <h1 id="frequently-asked-questions-about-setup"><a class="header" href="#frequently-asked-questions-about-setup">Frequently asked questions about setup</a></h1>
+<h2 id="why-do-i-need-a-domain-for-my-town"><a class="header" href="#why-do-i-need-a-domain-for-my-town">Why do I need a domain for my town?</a></h2>
+<p>Alright, there are two reasons for this, let me explain.</p>
+<p>First, if you don't have a domain, the server address of your town will be in all of the addresses of all of the people in your town. This would mean that if the address of the server ever changes (like if you want to move to a more powerful machine) everyone would lose their connections to people outside of your town. It would break everything in decentralization. The Liphium server is also designed in a way where it never expects to have the address of it change. Meaning if you don't have a domain and want to change the address of your server, you'll go through a lot of complaints from the <strong>people in your town losing connections to friends in other towns</strong>. And <strong>you'd have to delete all of the accounts</strong> as the server can't change the address of the friends you've saved in your vault. Would be kinda bad wouldn't it?</p>
+<p>Second, by default Liphium blocks all towns that are using an insecure protocol. And because you can't have HTTPS when you just use a plain IP address you will never be able to connect to any towns running on the default configuration (which is basically all of them) because there are major security implications if you were to actually use a town without HTTPS in production.</p>
+<p>I hope you understood the reasoning for this requirement and make the right choice. I will not help you with any of this stuff and if any request of this issue ever reaches me, I will ignore it. But if you have a good, secure and reasonable idea of how to solve this problem for everyone without huge migrations and want to implement all of it yourself, <a href="https://github.com/Liphium/station">feel free to file an issue</a> as Liphium is open source. We can then discuss this further together.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../setup/config-setup.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../setup/docker.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../migration/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -180,11 +178,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../setup/config-setup.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../setup/docker.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../migration/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
