@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/tabs.css">
 
 
         <!-- Provide site root to javascript -->
@@ -153,14 +154,14 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="migration-guides"><a class="header" href="#migration-guides">Migration guides</a></h1>
-<p>Welcome to the official place for everything that breaks and changes in Liphium. If anything needs to be changed about your server configuration before updating your Town, you will find it here.</p>
-<p>We always leave every single migration guide up which means that you might find ones that are really old. When you upgrade your server, make sure to always use the latest guide. If you're coming from 0.4.0 and want to upgrade to 0.5.0/0.5.1, you can find the latest guide <a href="/migration/0.5-migration.html">here</a>.</p>
+<p>Welcome to the official place for everything that breaks and changes in Liphium. If anything needs to be changed about your server configuration before updating your Town, you will find it here. Just click on the next version above the version you are currently using right in the sidebar and go through all of the guides until you reach the latest version.</p>
+<p>We recommend to not enable auto updates on your Docker container simply due to <strong>breaking changes</strong> that might happen. This is not just during the Beta, but it will occasionally happen due to changes we have to make.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../setup/docker.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../setup/faq.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
@@ -174,7 +175,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../setup/docker.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../setup/faq.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
@@ -185,6 +186,22 @@
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
@@ -202,6 +219,7 @@
         <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/tabs.js"></script>
 
 
     </div>

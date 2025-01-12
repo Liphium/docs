@@ -29,6 +29,7 @@
         <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/tabs.css">
 
 
         <!-- Provide site root to javascript -->
@@ -154,22 +155,44 @@
                     <main>
                         <h1 id="migration-to-station-050"><a class="header" href="#migration-to-station-050">Migration to station 0.5.0</a></h1>
 <p>Just before we start, I just wanted to mention that your town will likely still run even with the current configuration. It's just that if you want to take full advantage of the update and most importantly, Spaces, then I would recommend sticking with me just a little bit longer. It's really not a lot of changes.</p>
-<h3 id="everything-that-changed"><a class="header" href="#everything-that-changed">Everything that changed</a></h3>
+<h2 id="everything-that-changed"><a class="header" href="#everything-that-changed">Everything that changed</a></h2>
 <ul>
 <li>A lot of environment variables are now redundant and no longer needed because LiveKit support was removed with the 0.5.0 update.</li>
 <li>A new Nginx configuration has been added to the Docker guide to handle the new port that opened for Spaces.</li>
 </ul>
-<h3 id="how-to-migrate-to-050"><a class="header" href="#how-to-migrate-to-050">How to migrate to 0.5.0</a></h3>
+<h2 id="how-to-migrate-to-050"><a class="header" href="#how-to-migrate-to-050">How to migrate to 0.5.0</a></h2>
 <p>Let's remove some clutter from your <code>config.env</code> file first. Just as a reference, this is the file where all of your environment variables are stored. If it's not called <code>config.env</code> it doesn't matter.</p>
 <p><strong>1.</strong> You can safely remove any environment variable with the prefix <code>SS_LK_</code> as they are not needed anymore due to the removal of LiveKit support.</p>
 <p><strong>2.</strong> <code>MAX_FILE_SIZE</code>, <code>MAX_TOTAL_STORAGE</code> and <code>MAX_FAVORITE_STORAGE</code> can also be removed. These things can now be configured by going to Settings &gt; Town &gt; Files.</p>
-<p>Now for the Nginx configuration. I actually didn't change a whole lot there, so this is basically just copying a file into a directory.</p>
+<p>Now for the Nginx configuration. I actually didn't change a whole lot there, so this is basically just copying a file into a directory. <strong>This part of the migration guide is only important if you followed the official Docker installation tutorial</strong>.</p>
 <p><strong>3.</strong> Go to <code>/etc/nginx/sites-available</code> where all of your configurations are stored.</p>
-<p><strong>4.</strong> Download the new <code>liphium-spaces</code> file from <a href="https://gist.github.com/Unbreathable/0469cfd271b84340429c140dde830642">this GitHub Gist</a> and add it to the folder.</p>
+<p><strong>4.</strong> Put the configuration below into a new file called <code>liphium-spaces</code> and add it to the folder and replace <code>spaces.example.com</code> with your domain.</p>
+<pre><code class="language-sh">server {
+    server_name spaces.example.com;
+
+    # The WebSocket gateway
+    location /gateway {
+        proxy_http_version 1.1;
+
+        proxy_connect_timeout 7d;
+        proxy_send_timeout 7d;
+        proxy_read_timeout 7d;
+
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_pass http://localhost:4002/gateway;
+    }
+
+    location / {
+        proxy_pass http://localhost:4002;
+    }
+}
+</code></pre>
 <p><strong>5.</strong> Link the file to the <code>/etc/nginx/sites-enabled</code> folder by running the command below (assuming you still named the file liphium-spaces).</p>
 <pre><code class="language-sh">ln -s /etc/nginx/sites-available/liphium-spaces /etc/nginx/sites-enabled/liphium-spaces
 </code></pre>
-<h3 id="and-a-little-apology"><a class="header" href="#and-a-little-apology">And a little apology</a></h3>
+<h2 id="and-a-little-apology"><a class="header" href="#and-a-little-apology">And a little apology</a></h2>
 <p>I'm sorry for rolling out this update in such a weird way. I learned from my mistakes and next time I'll make sure to provide migration guides and resources on what's new directly before the update and not when it's already out for a day.</p>
 <p>Well, some of the problems with the recent update have already been fixed in a little update called 0.5.1 for the server and v0.5.2 for the client, respectively. I hope that this doesn't happen again and in the future all the releases will be thorougly tested before release. I complain about this myself all the time, so I also wanna prevent it for my own app.</p>
 <p>And with that, I wish you a happy rest of your day and a lot of fun with Liphium!</p>
@@ -182,6 +205,9 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
+                            <a rel="next prefetch" href="../migration/0.6-migration.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -193,10 +219,29 @@
                         <i class="fa fa-angle-left"></i>
                     </a>
 
+                    <a rel="next prefetch" href="../migration/0.6-migration.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
             </nav>
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
@@ -214,6 +259,7 @@
         <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/tabs.js"></script>
 
 
     </div>
