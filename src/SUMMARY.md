@@ -8,5 +8,3 @@
 - [Migration](./migration/index.md)
   - [Migration to 0.5.0](./migration/0.5-migration.md)
   - [Migration to 0.6.0](./migration/0.6-migration.md)
-- [Town administration](./admin/index.md)
-  - [Frequently asked questions](./admin/faq.md)

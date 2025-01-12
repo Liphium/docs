@@ -551,11 +551,6 @@ location /auth/liveshare/upload {
 </code></pre>
 <h2 id="thats-it"><a class="header" href="#thats-it">That's it</a></h2>
 <p>Well that's already it for this release. We'll have more changes like this that require a little bit of reconfiguration throughout the year I assume, we wanna add audio and video calls back after all. As usual, thanks for using and supporting Liphium! And with that, I wish you a happy rest of your day.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="town-administration"><a class="header" href="#town-administration">Town administration</a></h1>
-<p>Here you can learn everything about how to configure your town and how to make it completely yours.</p>
-<p>Be aware that everything in this part of the documentation only covers everything you can change directly in the app. For everything else, you can go to our <a href="admin/../setup/config-setup.html#an-overview-of-the-configuration">configuration guide</a> for the configuration/environment file for station and look at the overview of the configuration.</p>
-<p>If you have any question and don't know where to look, you might want to take a look at the <a href="admin/./faq.html">frequently asked questions</a> about administration.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="frequently-asked-questions-about-administration"><a class="header" href="#frequently-asked-questions-about-administration">Frequently asked questions about administration</a></h1>
 
                     </main>
 
@@ -574,6 +569,22 @@ location /auth/liveshare/upload {
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
