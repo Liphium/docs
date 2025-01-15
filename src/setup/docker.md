@@ -110,6 +110,13 @@ server {
         proxy_pass http://localhost:4001/liveshare/subscribe;
     }
 
+    # Zap upload endpoint (just to make sure nothing happens)
+    location /auth/liveshare/upload {
+        proxy_http_version 1.1;
+        client_max_body_size 1100k;
+        proxy_pass http://localhost:4001/auth/liveshare/upload;
+    }
+
     # WebSocket endpoint
     location /gateway {
         proxy_http_version 1.1;
