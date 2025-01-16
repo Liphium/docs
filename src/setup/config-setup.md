@@ -175,8 +175,8 @@ Now repeat the same for the database configuration of the chat server:
 **4.** Now change the following configuration values for your mail server that Station will use:
 
 - SMTP_SERVER=mail.example.com (the domain of your mail server, replace `example.com` with your domain)
-- SMTP_PORT=your_smtp_port
-- SMTP_IDENTITY=your_smtp_identity
+- SMTP_PORT=your_smtp_port (Liphium sends mail over TLS, so please use the TLS port for your mail server, in most cases: 587)
+- SMTP_IDENTITY=your_smtp_identity (you can just leave this empty if your mail server doesn't tell you a specific value)
 - SMTP_FROM=no-reply@example.com (the email you want Liphium to use)
 - SMTP_USER=your_smtp_username
 - SMTP_PW=your_smtp_password
